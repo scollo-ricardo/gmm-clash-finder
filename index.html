@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMM 2025 — Festival Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0e;
+  --surface: #141416;
+  --surface2: #1c1c1f;
+  --surface3: #242428;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #f0ede8;
+  --muted: #888880;
+  --accent: #e8c547;
+  --clash: #e5533a;
+  --fav: #e8c547;
+
+  --south:  #b8a9f0;
+  --north:  #7ec8e3;
+  --marq:   #7ed9a0;
+  --jupiler:#f0a07a;
+  --dome:   #f0d07a;
+
+  --south-bg:  rgba(184,169,240,0.15);
+  --north-bg:  rgba(126,200,227,0.15);
+  --marq-bg:   rgba(126,217,160,0.15);
+  --jupiler-bg:rgba(240,160,122,0.15);
+  --dome-bg:   rgba(240,208,122,0.15);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--accent);
+}
+.logo span { color: var(--muted); font-size: 14px; letter-spacing: 1px; margin-left: 8px; }
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+
+.sync-indicator {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--muted);
+}
+.sync-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #4caf50; animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.user-badge {
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-family: 'DM Mono', monospace;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+/* ── LAYOUT ── */
+.container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+
+/* ── TABS ── */
+.main-tabs {
+  display: flex; gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 1.5rem;
+  width: fit-content;
+}
+.main-tab {
+  padding: 7px 18px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all .2s;
+  position: relative;
+}
+.main-tab.active {
+  background: var(--surface3);
+  color: var(--text);
+}
+.main-tab .badge {
+  position: absolute; top: 2px; right: 4px;
+  background: var(--accent); color: #000;
+  font-size: 9px; font-weight: 700;
+  border-radius: 8px; padding: 1px 4px; min-width: 14px; text-align: center;
+}
+
+.day-tabs {
+  display: flex; gap: 6px; margin-bottom: 1.25rem; flex-wrap: wrap;
+}
+.day-tab {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  transition: all .15s;
+}
+.day-tab:hover { border-color: var(--border2); color: var(--text); }
+.day-tab.active { border-color: var(--accent); color: var(--accent); }
+
+/* ── STAGE LEGEND ── */
+.stage-legend {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1.25rem;
+}
+.legend-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  font-size: 12px; color: var(--muted);
+}
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ── TIMELINE ── */
+.timeline-scroll { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+.timeline-inner { min-width: 1000px; }
+
+.tl-ruler {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0;
+}
+.tl-stage-label-hdr {
+  width: 130px; min-width: 130px;
+  border-right: 1px solid var(--border);
+  padding: 8px;
+}
+.tl-ruler-times { flex: 1; position: relative; height: 32px; }
+.tl-tick {
+  position: absolute;
+  font-size: 10px; font-family: 'DM Mono', monospace;
+  color: var(--muted);
+  transform: translateX(-50%);
+  top: 8px;
+  white-space: nowrap;
+}
+.tl-tick::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 18px;
+  width: 1px; height: 8px;
+  background: var(--border);
+}
+
+.tl-row {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  min-height: 58px;
+}
+.tl-row:last-child { border-bottom: none; }
+
+.tl-stage-label {
+  width: 130px; min-width: 130px;
+  padding: 8px 10px;
+  font-size: 11px; font-weight: 500;
+  color: var(--muted);
+  border-right: 1px solid var(--border);
+  display: flex; align-items: center;
+  background: var(--surface);
+  letter-spacing: .5px;
+}
+
+.tl-slots { flex: 1; position: relative; background: var(--bg); }
+
+/* subtle grid lines */
+.tl-slots::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 1px, transparent 1px, transparent calc(100% / var(--tick-count)));
+  pointer-events: none;
+}
+
+.tl-band {
+  position: absolute;
+  top: 5px; bottom: 5px;
+  border-radius: 5px;
+  display: flex; align-items: center;
+  padding: 0 8px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: filter .15s, transform .1s;
+  font-size: 11px; font-weight: 500;
+  white-space: nowrap;
+  border: 1.5px solid transparent;
+  user-select: none;
+}
+.tl-band:hover { filter: brightness(1.15); transform: scaleY(1.04); z-index: 2; }
+.tl-band.fav { border-width: 2px; }
+.tl-band.clash { outline: 2px solid var(--clash); outline-offset: -1px; }
+.tl-band .fav-star {
+  margin-left: auto; padding-left: 6px;
+  font-size: 12px; opacity: .7; flex-shrink: 0;
+}
+
+/* ── BROWSE ── */
+.browse-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 8px;
+}
+.band-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.band-card:hover { border-color: var(--border2); background: var(--surface2); }
+.band-card.fav { border-color: var(--fav); background: rgba(232,197,71,.05); }
+.band-card.clash-card { border-color: var(--clash); }
+
+.stage-bar { width: 3px; height: 36px; border-radius: 2px; flex-shrink: 0; }
+.band-info { flex: 1; min-width: 0; }
+.band-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.band-meta { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 1px; }
+
+.clash-tag {
+  font-size: 10px; font-family: 'DM Mono', monospace;
+  padding: 2px 6px; border-radius: 4px;
+  background: rgba(229,83,58,.18); color: var(--clash);
+  flex-shrink: 0;
+}
+.fav-star-btn { font-size: 18px; color: var(--muted); flex-shrink: 0; transition: color .15s; }
+.fav-star-btn.on { color: var(--fav); }
+
+/* ── PICKS (SHARED) ── */
+.picks-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+.picks-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; }
+.online-users {
+  display: flex; gap: -4px; align-items: center;
+}
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; font-family: 'DM Mono', monospace;
+  margin-left: -6px;
+  flex-shrink: 0;
+}
+.avatar:first-child { margin-left: 0; }
+.online-label { font-size: 12px; color: var(--muted); margin-left: 10px; }
+
+.picks-user-section { margin-bottom: 1.5rem; }
+.picks-user-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.picks-user-name { font-size: 13px; font-weight: 500; font-family: 'DM Mono', monospace; }
+.picks-count { font-size: 12px; color: var(--muted); }
+.clash-summary {
+  background: rgba(229,83,58,.1);
+  border: 1px solid rgba(229,83,58,.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 1rem;
+  font-size: 12px;
+  color: #f07060;
+}
+.clash-summary strong { font-weight: 600; }
+.clash-line { margin-top: 4px; }
+
+.picks-day { margin-bottom: 12px; }
+.picks-day-label {
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--muted); font-family: 'DM Mono', monospace;
+  margin-bottom: 6px;
+}
+.picks-list { display: flex; flex-direction: column; gap: 5px; }
+.pick-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.pick-item.clash-pick { border-color: rgba(229,83,58,.4); }
+.pick-item:hover { border-color: var(--border2); }
+.pick-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.pick-name { font-weight: 500; flex: 1; }
+.pick-meta { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+.empty-msg { padding: 3rem 0; text-align: center; color: var(--muted); font-size: 14px; }
+
+/* ── NAME MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(4px);
+}
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 2rem;
+  width: 340px;
+  text-align: center;
+}
+.modal h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px; letter-spacing: 1.5px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.modal p { color: var(--muted); font-size: 13px; margin-bottom: 1.5rem; }
+.modal input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 12px;
+  outline: none;
+  transition: border-color .15s;
+}
+.modal input:focus { border-color: var(--accent); }
+.modal button {
+  width: 100%;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.modal button:hover { opacity: .85; }
+
+.section { display: none; }
+.section.visible { display: block; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Name Modal -->
+<div class="modal-overlay" id="nameModal">
+  <div class="modal">
+    <h2>GMM 2025</h2>
+    <p>Enter your name to join the shared festival planner</p>
+    <input id="nameInput" type="text" placeholder="Your name..." maxlength="20" autocomplete="off">
+    <button onclick="setUser()">Enter the pit ↗</button>
+  </div>
+</div>
+
+<header>
+  <div class="logo">GRASPOP 2025 <span>FESTIVAL PLANNER</span></div>
+  <div class="header-right">
+    <div class="sync-indicator">
+      <div class="sync-dot"></div>
+      <span id="syncLabel">Live</span>
+    </div>
+    <div class="user-badge" id="userBadge" onclick="changeUser()">—</div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="main-tabs">
+    <button class="main-tab active" onclick="switchView('timeline',this)">Timeline</button>
+    <button class="main-tab" onclick="switchView('browse',this)">Browse</button>
+    <button class="main-tab" onclick="switchView('picks',this)">Shared picks <span class="badge" id="sharedCount" style="display:none"></span></button>
+  </div>
+
+  <!-- TIMELINE -->
+  <div id="v-timeline" class="section visible">
+    <div class="stage-legend" id="legend"></div>
+    <div class="day-tabs" id="tlDays"></div>
+    <div class="timeline-scroll"><div class="timeline-inner" id="tlInner"></div></div>
+  </div>
+
+  <!-- BROWSE -->
+  <div id="v-browse" class="section">
+    <div class="day-tabs" id="brDays"></div>
+    <div class="browse-grid" id="brGrid"></div>
+  </div>
+
+  <!-- PICKS -->
+  <div id="v-picks" class="section">
+    <div class="picks-header">
+      <div class="picks-title">Shared Picks</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="online-users" id="onlineUsers"></div>
+        <span class="online-label" id="onlineLabel"></span>
+      </div>
+    </div>
+    <div id="picksContent"></div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const STAGE_CFG = {
+  "South Stage":   {color:"#b8a9f0", bg:"rgba(184,169,240,0.18)", dark:"#7e6fd4"},
+  "North Stage":   {color:"#7ec8e3", bg:"rgba(126,200,227,0.18)", dark:"#4aa8cb"},
+  "Marquee":       {color:"#7ed9a0", bg:"rgba(126,217,160,0.18)", dark:"#4bb878"},
+  "Jupiler Stage": {color:"#f0a07a", bg:"rgba(240,160,122,0.18)", dark:"#d47848"},
+  "Metal Dome":    {color:"#f0d07a", bg:"rgba(240,208,122,0.18)", dark:"#c8a830"},
+};
+const STAGES = Object.keys(STAGE_CFG);
+const DAYS = ["Thursday 18th June","Friday 19th June","Saturday 20th June","Sunday 21st June"];
+const DAY_SHORT = ["Thu 18","Fri 19","Sat 20","Sun 21"];
+
+const AVATAR_COLORS = ["#b8a9f0","#7ec8e3","#7ed9a0","#f0a07a","#f0d07a","#e8c547","#f07ba0","#a0d4f0"];
+
+function toMins(t){const[h,m]=t.split(":").map(Number);return h*60+m;}
+function fmtT(mins){const h=Math.floor(mins/60)%24,m=mins%60;return`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;}
+
+const RAW = {
+  "South Stage":{
+    "Thursday 18th June":[["12:50","13:35","Ego Kill Talent"],["14:30","15:15","Danko Jones"],["16:20","17:10","Accept"],["18:20","19:20","A Day To Remember"],["20:40","21:55","Within Temptation"],["23:30","25:00","The Offspring"]],
+    "Friday 19th June":[["12:00","12:45","Quicksand"],["13:50","14:40","Bush"],["15:50","16:40","Cavalera 'Chaos A.D.'"],["17:50","18:40","Sex Pistols ft. Frank Carter"],["20:00","21:00","Alter Bridge"],["22:35","24:05","Volbeat"]],
+    "Saturday 20th June":[["12:50","13:35","Fleddy Melculy"],["14:35","15:25","Malevolence"],["16:35","17:25","Hollywood Undead"],["18:35","19:35","Ice Nine Kills"],["20:55","22:10","Architects"],["24:00","25:30","Bring Me The Horizon"]],
+    "Sunday 21st June":[["12:00","12:50","Battle Beast"],["14:00","14:50","Life Of Agony"],["16:00","16:50","Extreme"],["18:00","19:00","Black Label Society"],["20:25","21:40","Electric Callboy"],["23:30","25:00","Sabaton"]],
+  },
+  "North Stage":{
+    "Thursday 18th June":[["13:40","14:25","Static-X"],["15:20","16:10","Wind Rose"],["17:20","18:10","Tom Morello"],["19:30","20:30","Megadeth"],["22:05","23:20","Limp Bizkit"]],
+    "Friday 19th June":[["14:50","15:40","Drowning Pool"],["16:50","17:40","Mammoth"],["18:50","19:50","Trivium"],["21:10","22:25","Breaking Benjamin"],["24:15","25:35","Knocked Loose"]],
+    "Saturday 20th June":[["12:00","12:45","The Pretty Wild"],["13:40","14:25","P.O.D."],["15:35","16:25","Sepultura"],["17:30","18:25","Three Days Grace"],["19:45","20:45","Babymetal"],["22:20","23:50","Bad Omens"]],
+    "Sunday 21st June":[["15:00","15:50","Europe"],["17:00","17:50","Foreigner"],["19:10","20:15","Alice Cooper"],["21:50","23:20","Def Leppard"]],
+  },
+  "Marquee":{
+    "Thursday 18th June":[["12:00","12:40","Distant"],["13:15","14:00","Dying Wish"],["14:40","15:30","Snot"],["16:10","17:00","Gatecreeper"],["17:40","18:30","Wolves In The Throne Room"],["19:10","20:00","Septicflesh"],["20:40","21:30","Cult Of Luna"],["22:30","23:45","Anthrax"]],
+    "Friday 19th June":[["12:15","12:55","Hulder"],["13:30","14:15","Bark"],["14:50","15:35","Asomvel"],["16:15","17:05","Forbidden"],["17:55","18:45","Old Man's Child"],["19:25","20:15","Possessed"],["20:55","21:45","Death To All"],["22:35","23:35","Cradle of Filth"]],
+    "Saturday 20th June":[["12:15","12:55","Embryonic Autopsy"],["13:40","14:25","Sinsaenum"],["15:05","15:50","Uada"],["16:25","17:15","Terrorizer"],["17:55","18:45","Lacuna Coil"],["19:20","20:10","Corrosion Of Conformity"],["20:55","21:45","Moonspell"],["22:35","23:35","Six Feet Under"]],
+    "Sunday 21st June":[["12:00","12:40","Killus"],["13:15","14:00","Gaerea"],["14:40","15:30","Decapitated"],["16:10","17:00","Vltimas"],["17:40","18:30","Kanonenfieber"],["19:10","20:00","The Gathering"],["20:40","21:30","Venom"],["22:30","23:45","Mastodon"]],
+  },
+  "Jupiler Stage":{
+    "Thursday 18th June":[["12:40","13:20","Blackgold"],["14:00","14:45","Slay Squad"],["15:40","16:25","Thrown"],["17:25","18:10","Grade 2"],["19:10","20:00","John Coffey"],["21:00","21:50","Pennywise"],["23:00","24:00","The Dillinger Escape Plan"]],
+    "Friday 19th June":[["12:40","13:20","Thornhill"],["14:00","14:45","Letlive."],["15:40","16:25","Guilt Trip"],["17:20","18:10","Drain"],["19:10","20:00","We Came As Romans"],["21:00","21:50","Kublai Khan Tx"],["23:00","24:00","Lion Heart"]],
+    "Saturday 20th June":[["12:40","13:20","Vicious Rumors"],["14:00","14:45","Feuerschwanz"],["15:40","16:25","Primal Fear"],["17:20","18:10","Orden Ogan"],["19:10","20:00","Sonata Arctica"],["21:00","21:50","Queensryche"],["23:00","24:00","Avatar"]],
+    "Sunday 21st June":[["12:40","13:20","Scowl"],["14:00","14:45","Harms Way"],["15:40","16:25","Wargasm"],["17:25","18:10","Set It Off"],["19:10","20:00","Lagwagon"],["21:00","21:50","Bury Tomorrow"],["23:00","24:00","The Plot In You"]],
+  },
+  "Metal Dome":{
+    "Thursday 18th June":[["12:00","12:40","Magnolia Park"],["13:20","14:00","Ankor"],["14:50","15:35","The Funeral Portrait"],["16:30","17:20","Sleep Theory"],["18:15","19:05","Lakeview"],["20:05","20:55","Bloodywood"],["21:55","22:55","President"]],
+    "Friday 19th June":[["13:20","14:00","Oranssi Pazuzu"],["16:30","17:15","Harakiri For The Sky"],["18:15","19:05","Elder"],["20:05","20:55","Kadavar"],["21:55","22:55","Leprous"]],
+    "Saturday 20th June":[["12:00","12:40","Mouth Culture"],["13:20","14:00","Faetooth"],["14:50","15:35","Rivers Of Nihil"],["16:30","17:15","Loathe"],["18:15","19:05","Catch Your Breath"],["20:05","20:55","Uncle Acid & The Deadbeats"],["21:55","22:55","Tesseract"]],
+    "Sunday 21st June":[["12:00","12:40","Return To Dust"],["13:20","14:00","Rain City Drive"],["14:50","15:35","TX2"],["16:30","17:20","Future Palace"],["18:15","19:05","Periphery"],["20:05","20:55","Solstafir"],["21:55","22:55","Carpenter Brut"]],
+  },
+};
+
+// ─── SHARED STATE (localStorage as shared layer) ─────────────────────────────
+// Key: "gmm2025_picks"  → {username: {name, color, picks: ["band|day", ...]}}
+
+const STORAGE_KEY = "gmm2025_picks";
+const USERS_KEY = "gmm2025_users";
+
+let currentUser = null;
+
+function loadShared(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"); } catch(e){ return {}; }
+}
+function saveShared(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); broadcastChange(); }
+
+function broadcastChange(){
+  // Use BroadcastChannel to sync across tabs
+  try { ch.postMessage("update"); } catch(e){}
+}
+
+let ch;
+try {
+  ch = new BroadcastChannel("gmm2025");
+  ch.onmessage = () => { refresh(); };
+} catch(e){ ch = {postMessage:()=>{}}; }
+
+// Also poll every 3s as fallback
+setInterval(refresh, 3000);
+
+function getMyPicks(){
+  const data = loadShared();
+  return new Set(data[currentUser]?.picks || []);
+}
+
+function togglePick(bandKey){
+  const data = loadShared();
+  if(!data[currentUser]) data[currentUser] = {name: currentUser, color: getUserColor(currentUser), picks:[]};
+  const picks = new Set(data[currentUser].picks);
+  picks.has(bandKey) ? picks.delete(bandKey) : picks.add(bandKey);
+  data[currentUser].picks = [...picks];
+  saveShared(data);
+  refresh();
+}
+
+function bandKey(name, day){ return `${name}||${day}`; }
+function parseBandKey(k){ const p=k.split("||"); return {name:p[0], day:p[1]}; }
+
+// ─── USER MANAGEMENT ────────────────────────────────────────────────────────
+
+function getUserColor(name){
+  let hash = 0;
+  for(let i=0;i<name.length;i++) hash = name.charCodeAt(i) + ((hash<<5)-hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
+function getInitials(name){ return name.slice(0,2).toUpperCase(); }
+
+function setUser(){
+  const val = document.getElementById("nameInput").value.trim();
+  if(!val) return;
+  currentUser = val;
+  document.getElementById("userBadge").textContent = val;
+  document.getElementById("nameModal").style.display = "none";
+  // Register user
+  const data = loadShared();
+  if(!data[currentUser]) { data[currentUser] = {name:currentUser, color:getUserColor(currentUser), picks:[]}; saveShared(data); }
+  refresh();
+}
+
+function changeUser(){
+  document.getElementById("nameInput").value = currentUser || "";
+  document.getElementById("nameModal").style.display = "flex";
+}
+
+document.getElementById("nameInput").addEventListener("keydown", e => { if(e.key==="Enter") setUser(); });
+
+// ─── CLASH DETECTION ─────────────────────────────────────────────────────────
+
+function getBandData(name, day){
+  for(const stage of STAGES){
+    for(const [s,e,n] of (RAW[stage][day]||[])){
+      if(n===name) return {name,day,stage,start:toMins(s),end:toMins(e),startStr:s,endStr:e};
+    }
+  }
+  return null;
+}
+
+function getClashKeys(picks){
+  const bands = [...picks].map(k=>{ const {name,day}=parseBandKey(k); return getBandData(name,day); }).filter(Boolean);
+  const clashKeys = new Set();
+  const clashPairs = [];
+  for(let i=0;i<bands.length;i++){
+    for(let j=i+1;j<bands.length;j++){
+      const a=bands[i],b=bands[j];
+      if(a.day===b.day && a.start<b.end && b.start<a.end){
+        clashKeys.add(bandKey(a.name,a.day));
+        clashKeys.add(bandKey(b.name,b.day));
+        clashPairs.push([a,b]);
+      }
+    }
+  }
+  return {clashKeys, clashPairs};
+}
+
+// ─── VIEWS ───────────────────────────────────────────────────────────────────
+
+let tlDay=0, brDay=0, currentView="timeline";
+
+function switchView(v, btn){
+  currentView=v;
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("visible"));
+  document.getElementById("v-"+v).classList.add("visible");
+  document.querySelectorAll(".main-tab").forEach(t=>t.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  render();
+}
+
+function render(){
+  if(currentView==="timeline") renderTimeline();
+  else if(currentView==="browse") renderBrowse();
+  else if(currentView==="picks") renderPicks();
+  updateSharedCount();
+  renderOnlineUsers();
+}
+
+function refresh(){ render(); }
+
+// ─── LEGEND ──────────────────────────────────────────────────────────────────
+function buildLegend(){
+  const c = document.getElementById("legend");
+  c.innerHTML = STAGES.map(s=>`
+    <div class="legend-pill">
+      <div class="legend-dot" style="background:${STAGE_CFG[s].color}"></div>
+      ${s}
+    </div>`).join("");
+}
+
+// ─── TIMELINE ────────────────────────────────────────────────────────────────
+function buildDayTabs(containerId, active, fn){
+  document.getElementById(containerId).innerHTML =
+    DAYS.map((d,i)=>`<button class="day-tab${i===active?" active":""}" onclick="${fn}(${i})">${DAY_SHORT[i]}</button>`).join("");
+}
+
+function switchTlDay(i){ tlDay=i; buildDayTabs("tlDays",tlDay,"switchTlDay"); renderTimeline(); }
+
+function renderTimeline(){
+  buildDayTabs("tlDays",tlDay,"switchTlDay");
+  const day = DAYS[tlDay];
+  const myPicks = getMyPicks();
+  const {clashKeys} = getClashKeys(myPicks);
+
+  // compute time range
+  let minT=720, maxT=780;
+  for(const st of STAGES) for(const [s,e] of (RAW[st][day]||[])){
+    minT=Math.min(minT,toMins(s)); maxT=Math.max(maxT,toMins(e));
+  }
+  minT=Math.floor(minT/30)*30; maxT=Math.ceil(maxT/30)*30;
+  const span = maxT-minT;
+  const tickCount = (maxT-minT)/30;
+
+  // ruler ticks
+  const ticks=[];
+  for(let t=minT;t<=maxT;t+=30) ticks.push(t);
+
+  let html = `<div class="tl-ruler">
+    <div class="tl-stage-label-hdr"></div>
+    <div class="tl-ruler-times">
+      ${ticks.map(t=>`<span class="tl-tick" style="left:${((t-minT)/span*100).toFixed(2)}%">${fmtT(t)}</span>`).join("")}
+    </div>
+  </div>`;
+
+  for(const stage of STAGES){
+    const cfg = STAGE_CFG[stage];
+    const bands = RAW[stage][day]||[];
+    html += `<div class="tl-row">
+      <div class="tl-stage-label" style="border-left:3px solid ${cfg.color}">${stage}</div>
+      <div class="tl-slots" style="--tick-count:${tickCount}">`;
+    for(const [s,e,name] of bands){
+      const sm=toMins(s), em=toMins(e);
+      const left=((sm-minT)/span*100).toFixed(2);
+      const width=((em-sm)/span*100).toFixed(2);
+      const k = bandKey(name,day);
+      const isFav = myPicks.has(k);
+      const isClash = clashKeys.has(k);
+      const bdr = isFav ? `border-color:${cfg.color};border-width:2px` : "";
+      html += `<div class="tl-band${isFav?" fav":""}${isClash?" clash":""}"
+        style="left:${left}%;width:calc(${width}% - 2px);background:${cfg.bg};color:${cfg.color};${bdr}"
+        onclick="tlToggle('${name.replace(/'/g,"\\'")}','${day}')"
+        title="${name} · ${s}–${e}">
+        <span style="overflow:hidden;text-overflow:ellipsis">${name}</span>
+        ${isFav?`<span class="fav-star">★</span>`:""}
+      </div>`;
+    }
+    html += `</div></div>`;
+  }
+  document.getElementById("tlInner").innerHTML = html;
+}
+
+function tlToggle(name, day){ if(!currentUser)return; togglePick(bandKey(name,day)); }
+
+// ─── BROWSE ──────────────────────────────────────────────────────────────────
+function switchBrDay(i){ brDay=i; buildDayTabs("brDays",brDay,"switchBrDay"); renderBrowse(); }
+
+function renderBrowse(){
+  buildDayTabs("brDays",brDay,"switchBrDay");
+  const day = DAYS[brDay];
+  const myPicks = getMyPicks();
+  const {clashKeys} = getClashKeys(myPicks);
+
+  // all bands for the day, sorted by time
+  const list = [];
+  for(const stage of STAGES) for(const [s,e,name] of (RAW[stage][day]||[])) list.push({name,stage,s,e});
+  list.sort((a,b)=>toMins(a.s)-toMins(b.s));
+
+  document.getElementById("brGrid").innerHTML = list.map(({name,stage,s,e})=>{
+    const k=bandKey(name,day);
+    const fav=myPicks.has(k), clash=clashKeys.has(k);
+    const cfg=STAGE_CFG[stage];
+    return `<div class="band-card${fav?" fav":""}${clash?" clash-card":""}" onclick="brToggle('${name.replace(/'/g,"\\'")}','${day}')">
+      <div class="stage-bar" style="background:${cfg.color}"></div>
+      <div class="band-info">
+        <div class="band-name">${name}</div>
+        <div class="band-meta">${stage} · ${s}–${e}</div>
+      </div>
+      ${clash?`<span class="clash-tag">clash</span>`:""}
+      <span class="fav-star-btn${fav?" on":""}">${fav?"★":"☆"}</span>
+    </div>`;
+  }).join("");
+}
+
+function brToggle(name, day){ if(!currentUser)return; togglePick(bandKey(name,day)); }
+
+// ─── SHARED PICKS ────────────────────────────────────────────────────────────
+function renderPicks(){
+  const data = loadShared();
+  const users = Object.keys(data).filter(u=>data[u].picks?.length>0);
+  const c = document.getElementById("picksContent");
+
+  if(!users.length){ c.innerHTML=`<div class="empty-msg">No picks yet — star some bands to add them here!</div>`; return; }
+
+  let html = "";
+  for(const uname of users){
+    const ud = data[uname];
+    const picks = new Set(ud.picks||[]);
+    const {clashKeys, clashPairs} = getClashKeys(picks);
+    const color = ud.color || getUserColor(uname);
+    const isMe = uname === currentUser;
+
+    html += `<div class="picks-user-section">
+      <div class="picks-user-header">
+        <div class="avatar" style="background:${color};color:#000;margin-left:0">${getInitials(uname)}</div>
+        <span class="picks-user-name" style="color:${color}">${uname}${isMe?" (you)":""}</span>
+        <span class="picks-count">${picks.size} pick${picks.size!==1?"s":""}</span>
+      </div>`;
+
+    if(clashPairs.length){
+      html += `<div class="clash-summary">`;
+      html += clashPairs.map(([a,b])=>`<div class="clash-line">⚡ <strong>${a.name}</strong> vs <strong>${b.name}</strong> — ${a.day.split(" ")[0]} ${a.startStr}–${a.endStr} overlaps ${b.startStr}–${b.endStr}</div>`).join("");
+      html += `</div>`;
+    }
+
+    for(const day of DAYS){
+      const dayPicks = [...picks].filter(k=>parseBandKey(k).day===day)
+        .map(k=>getBandData(parseBandKey(k).name, day)).filter(Boolean)
+        .sort((a,b)=>a.start-b.start);
+      if(!dayPicks.length) continue;
+
+      html += `<div class="picks-day">
+        <div class="picks-day-label">${day}</div>
+        <div class="picks-list">`;
+      for(const b of dayPicks){
+        const k=bandKey(b.name,b.day);
+        const clash=clashKeys.has(k);
+        const cfg=STAGE_CFG[b.stage];
+        html += `<div class="pick-item${clash?" clash-pick":""}" ${isMe?`onclick="togglePick('${k.replace(/'/g,"\\'")}')"`:""}>
+          <div class="pick-dot" style="background:${cfg.color}"></div>
+          <span class="pick-name">${b.name}</span>
+          <span class="pick-meta">${b.stage} · ${b.startStr}–${b.endStr}</span>
+          ${clash?`<span class="clash-tag">clash</span>`:""}
+          ${isMe?`<span style="color:${color};font-size:14px;margin-left:4px">★</span>`:""}
+        </div>`;
+      }
+      html += `</div></div>`;
+    }
+    html += `</div>`;
+  }
+  c.innerHTML = html;
+}
+
+function updateSharedCount(){
+  const data = loadShared();
+  const total = Object.values(data).reduce((n,u)=>n+(u.picks?.length||0),0);
+  const el = document.getElementById("sharedCount");
+  if(total>0){ el.textContent=total; el.style.display="inline-block"; }
+  else el.style.display="none";
+}
+
+function renderOnlineUsers(){
+  const data = loadShared();
+  const users = Object.keys(data);
+  const uEl = document.getElementById("onlineUsers");
+  const lEl = document.getElementById("onlineLabel");
+  uEl.innerHTML = users.slice(0,6).map(u=>{
+    const color = data[u]?.color || getUserColor(u);
+    return `<div class="avatar" style="background:${color};color:#000">${getInitials(u)}</div>`;
+  }).join("");
+  lEl.textContent = users.length ? `${users.length} planner${users.length!==1?"s":""}` : "";
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+buildLegend();
+render();
+</script>
+</body>
+</html>
