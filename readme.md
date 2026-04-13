@@ -21,7 +21,7 @@ A lightweight, client-side festival schedule planner. Browse full lineups across
 
 ## Usage
 
-Open `index.html` in a browser, or visit the [live site](https://scollo-ricardo.github.io/gmm-clash-finder/).
+Open `index.html` in a browser, or visit the [live site](https://scollo-ricardo.github.io/festival-clash-finder/).
 
 No build step, no dependencies, no server — just static HTML/CSS/JS served via GitHub Pages.
 
