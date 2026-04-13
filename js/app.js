@@ -257,6 +257,31 @@ document.getElementById("tlInner").addEventListener("keydown", e => {
   }
 });
 
+// Mobile timeline clicks (delegated)
+document.getElementById("tlMobile").addEventListener("click", e => {
+  // Sort tabs
+  const sortBtn = e.target.closest(".tl-mobile-sort-tab");
+  if(sortBtn){
+    mobileSort = sortBtn.dataset.sort;
+    render();
+    return;
+  }
+  // Band items
+  const item = e.target.closest(".tl-mobile-item");
+  if(!item || !currentUser) return;
+  togglePick(item.dataset.key);
+});
+
+// Mobile timeline keyboard
+document.getElementById("tlMobile").addEventListener("keydown", e => {
+  if(e.key === "Enter" || e.key === " "){
+    const item = e.target.closest(".tl-mobile-item");
+    if(!item || !currentUser) return;
+    e.preventDefault();
+    togglePick(item.dataset.key);
+  }
+});
+
 // Browse clicks (delegated)
 document.getElementById("brGrid").addEventListener("click", e => {
   const card = e.target.closest(".band-card");
@@ -338,12 +363,15 @@ function buildDayTabs(containerId){
 }
 
 // ─── TIMELINE ────────────────────────────────────────────────────────────────
+let mobileSort = "time"; // "time" or "stage"
+
 function renderTimeline(){
   buildDayTabs("tlDays");
   const day = DAYS[activeDay];
   const myPicks = getMyPicks();
   const {clashKeys} = getClashKeys(myPicks);
 
+  // ── Desktop horizontal timeline ──
   let minT=720, maxT=780;
   for(const st of STAGES) for(const [s,e] of (RAW[st][day]||[])){
     minT=Math.min(minT,toMins(s)); maxT=Math.max(maxT,toMins(e));
@@ -393,6 +421,75 @@ function renderTimeline(){
     html += `</div></div>`;
   }
   document.getElementById("tlInner").innerHTML = html;
+
+  // ── Mobile vertical timeline ──
+  renderTimelineMobile(day, myPicks, clashKeys);
+}
+
+function renderTimelineMobile(day, myPicks, clashKeys){
+  // Gather all bands for the day
+  const all = [];
+  for(const stage of STAGES){
+    for(const [s,e,name] of (RAW[stage][day]||[])){
+      all.push({name, stage, s, e, start: toMins(s), end: toMins(e)});
+    }
+  }
+
+  let mHtml = `<div class="tl-mobile-sort-tabs">
+    <button class="tl-mobile-sort-tab${mobileSort==="time"?" active":""}" data-sort="time">By time</button>
+    <button class="tl-mobile-sort-tab${mobileSort==="stage"?" active":""}" data-sort="stage">By stage</button>
+  </div>`;
+
+  if(mobileSort === "stage"){
+    // Group by stage
+    for(const stage of STAGES){
+      const cfg = STAGE_CFG[stage];
+      const bands = all.filter(b=>b.stage===stage).sort((a,b)=>a.start-b.start);
+      if(!bands.length) continue;
+      mHtml += `<div class="tl-mobile-stage-group">
+        <div class="tl-mobile-stage-label">
+          <span class="tl-mobile-stage-dot" style="background:${cfg.color}"></span>
+          ${stage}
+        </div>
+        <div class="tl-mobile-list">`;
+      for(const b of bands){
+        mHtml += renderMobileItem(b, day, myPicks, clashKeys);
+      }
+      mHtml += `</div></div>`;
+    }
+  } else {
+    // Sort by time
+    all.sort((a,b)=>a.start-b.start || a.stage.localeCompare(b.stage));
+    mHtml += `<div class="tl-mobile-list">`;
+    for(const b of all){
+      mHtml += renderMobileItem(b, day, myPicks, clashKeys);
+    }
+    mHtml += `</div>`;
+  }
+
+  document.getElementById("tlMobile").innerHTML = mHtml;
+}
+
+function renderMobileItem(b, day, myPicks, clashKeys){
+  const k = bandKey(b.name, day);
+  const isFav = myPicks.has(k);
+  const isClash = clashKeys.has(k);
+  const cfg = STAGE_CFG[b.stage];
+  const ds = fmtRuler(b.start), de = fmtRuler(b.end);
+  return `<div class="tl-mobile-item${isFav?" fav":""}${isClash?" clash":""}"
+    data-key="${escAttr(k)}" tabindex="0" role="button"
+    aria-label="${escAttr(b.name)}, ${b.stage}, ${ds} to ${de}${isFav?', favorited':''}${isClash?', time clash':''}">
+    <div class="tl-mobile-time">${ds}</div>
+    <div class="tl-mobile-bar" style="background:${cfg.color}" aria-hidden="true"></div>
+    <div class="tl-mobile-info">
+      <div class="tl-mobile-name">${esc(b.name)}</div>
+      <div class="tl-mobile-meta">${b.stage} · ${ds}–${de}</div>
+    </div>
+    <div class="tl-mobile-right">
+      ${isClash?`<span class="clash-tag" aria-label="Time clash">⚡</span>`:""}
+      <span class="fav-star-btn${isFav?" on":""}" aria-hidden="true">${isFav?"★":"☆"}</span>
+    </div>
+  </div>`;
 }
 
 // ─── BROWSE ──────────────────────────────────────────────────────────────────
