@@ -464,11 +464,12 @@ function renderBrowse(){
 }
 
 function renderBandCard({name,stage,s,e,day,k,fav,clash,cfg}){
-  return `<div class="band-card${fav?" fav":""}${clash?" clash-card":""}" data-key="${escAttr(k)}" tabindex="0" role="button" aria-label="${escAttr(name)}, ${stage}, ${s} to ${e}">
+  const ds = fmtRuler(toMins(s)), de = fmtRuler(toMins(e));
+  return `<div class="band-card${fav?" fav":""}${clash?" clash-card":""}" data-key="${escAttr(k)}" tabindex="0" role="button" aria-label="${escAttr(name)}, ${stage}, ${ds} to ${de}">
     <div class="stage-bar" style="background:${cfg.color}" aria-hidden="true"></div>
     <div class="band-info">
       <div class="band-name">${esc(name)}</div>
-      <div class="band-meta">${stage} · ${s}–${e}</div>
+      <div class="band-meta">${stage} · ${ds}–${de}</div>
     </div>
     ${clash?`<span class="clash-tag" aria-label="Time clash">⚡ clash</span>`:""}
     <span class="fav-star-btn${fav?" on":""}" aria-hidden="true">${fav?"★":"☆"}</span>
