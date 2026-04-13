@@ -16,22 +16,10 @@
   --border: rgba(255,255,255,0.07);
   --border2: rgba(255,255,255,0.13);
   --text: #f0ede8;
-  --muted: #888880;
+  --muted: #9e9e96;
   --accent: #e8c547;
   --clash: #e5533a;
   --fav: #e8c547;
-
-  --south:  #b8a9f0;
-  --north:  #7ec8e3;
-  --marq:   #7ed9a0;
-  --jupiler:#f0a07a;
-  --dome:   #f0d07a;
-
-  --south-bg:  rgba(184,169,240,0.15);
-  --north-bg:  rgba(126,200,227,0.15);
-  --marq-bg:   rgba(126,217,160,0.15);
-  --jupiler-bg:rgba(240,160,122,0.15);
-  --dome-bg:   rgba(240,208,122,0.15);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,6 +32,15 @@ body {
   font-size: 14px;
   line-height: 1.5;
 }
+
+/* ── SKIP LINK (a11y) ── */
+.skip-link {
+  position: absolute; left: -9999px; top: 0;
+  background: var(--accent); color: #000;
+  padding: 8px 16px; z-index: 300;
+  font-weight: 500; border-radius: 0 0 8px 0;
+}
+.skip-link:focus { left: 0; }
 
 /* ── HEADER ── */
 header {
@@ -89,6 +86,32 @@ header {
   color: var(--accent);
   cursor: pointer;
 }
+.user-badge:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 13px;
+  color: var(--text);
+  z-index: 300;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .25s, transform .25s;
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ── LAYOUT ── */
 .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
@@ -116,6 +139,7 @@ header {
   transition: all .2s;
   position: relative;
 }
+.main-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .main-tab.active {
   background: var(--surface3);
   color: var(--text);
@@ -142,6 +166,7 @@ header {
   transition: all .15s;
 }
 .day-tab:hover { border-color: var(--border2); color: var(--text); }
+.day-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .day-tab.active { border-color: var(--accent); color: var(--accent); }
 
 /* ── STAGE LEGEND ── */
@@ -157,18 +182,43 @@ header {
 }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
+/* ── SEARCH ── */
+.search-bar {
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+.search-bar input {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px 8px 36px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+.search-bar input::placeholder { color: var(--muted); }
+.search-bar input:focus { border-color: var(--accent); }
+.search-icon {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-size: 14px; pointer-events: none;
+}
+
 /* ── TIMELINE ── */
 .timeline-scroll { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
-.timeline-inner { min-width: 1000px; }
+.timeline-inner { min-width: 900px; }
 
 .tl-ruler {
   display: flex;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  position: sticky; top: 0;
+  position: sticky; top: 0; z-index: 2;
 }
 .tl-stage-label-hdr {
-  width: 130px; min-width: 130px;
+  width: 120px; min-width: 120px;
   border-right: 1px solid var(--border);
   padding: 8px;
 }
@@ -197,7 +247,7 @@ header {
 .tl-row:last-child { border-bottom: none; }
 
 .tl-stage-label {
-  width: 130px; min-width: 130px;
+  width: 120px; min-width: 120px;
   padding: 8px 10px;
   font-size: 11px; font-weight: 500;
   color: var(--muted);
@@ -209,7 +259,6 @@ header {
 
 .tl-slots { flex: 1; position: relative; background: var(--bg); }
 
-/* subtle grid lines */
 .tl-slots::before {
   content: '';
   position: absolute; inset: 0;
@@ -231,13 +280,40 @@ header {
   border: 1.5px solid transparent;
   user-select: none;
 }
-.tl-band:hover { filter: brightness(1.15); transform: scaleY(1.04); z-index: 2; }
+.tl-band:hover, .tl-band:focus-visible { filter: brightness(1.15); transform: scaleY(1.04); z-index: 2; }
+.tl-band:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .tl-band.fav { border-width: 2px; }
+.tl-band.clash::before {
+  content: '⚡';
+  font-size: 10px;
+  margin-right: 3px;
+  flex-shrink: 0;
+}
 .tl-band.clash { outline: 2px solid var(--clash); outline-offset: -1px; }
 .tl-band .fav-star {
   margin-left: auto; padding-left: 6px;
   font-size: 12px; opacity: .7; flex-shrink: 0;
 }
+
+/* Tooltip */
+.tl-band .tl-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--text);
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+}
+.tl-band:hover .tl-tooltip, .tl-band:focus-visible .tl-tooltip { display: block; }
 
 /* ── BROWSE ── */
 .browse-grid {
@@ -254,7 +330,8 @@ header {
   cursor: pointer;
   transition: border-color .15s, background .15s;
 }
-.band-card:hover { border-color: var(--border2); background: var(--surface2); }
+.band-card:hover, .band-card:focus-visible { border-color: var(--border2); background: var(--surface2); }
+.band-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .band-card.fav { border-color: var(--fav); background: rgba(232,197,71,.05); }
 .band-card.clash-card { border-color: var(--clash); }
 
@@ -272,24 +349,31 @@ header {
 .fav-star-btn { font-size: 18px; color: var(--muted); flex-shrink: 0; transition: color .15s; }
 .fav-star-btn.on { color: var(--fav); }
 
-/* ── PICKS (SHARED) ── */
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  padding: 2rem 0;
+  font-size: 14px;
+}
+
+/* ── PICKS ── */
 .picks-header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 1.25rem;
 }
 .picks-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; }
 .online-users {
-  display: flex; gap: -4px; align-items: center;
+  display: flex; align-items: center;
 }
 .avatar {
   width: 28px; height: 28px; border-radius: 50%;
   border: 2px solid var(--surface);
   display: flex; align-items: center; justify-content: center;
   font-size: 10px; font-weight: 700; font-family: 'DM Mono', monospace;
-  margin-left: -6px;
   flex-shrink: 0;
 }
-.avatar:first-child { margin-left: 0; }
+.online-users .avatar + .avatar { margin-left: -6px; }
 .online-label { font-size: 12px; color: var(--muted); margin-left: 10px; }
 
 .picks-user-section { margin-bottom: 1.5rem; }
@@ -327,16 +411,23 @@ header {
   background: var(--surface);
   border: 1px solid var(--border);
   font-size: 12px;
-  cursor: pointer;
   transition: border-color .15s;
 }
+.pick-item[role="button"] { cursor: pointer; }
+.pick-item[role="button"]:hover { border-color: var(--border2); }
+.pick-item[role="button"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .pick-item.clash-pick { border-color: rgba(229,83,58,.4); }
-.pick-item:hover { border-color: var(--border2); }
 .pick-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .pick-name { font-weight: 500; flex: 1; }
 .pick-meta { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
 
 .empty-msg { padding: 3rem 0; text-align: center; color: var(--muted); font-size: 14px; }
+
+.local-notice {
+  font-size: 11px; color: var(--muted); margin-bottom: 1rem;
+  padding: 8px 12px; border-radius: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+}
 
 /* ── NAME MODAL ── */
 .modal-overlay {
@@ -346,6 +437,7 @@ header {
   z-index: 200;
   backdrop-filter: blur(4px);
 }
+.modal-overlay[aria-hidden="true"] { display: none; }
 .modal {
   background: var(--surface);
   border: 1px solid var(--border2);
@@ -389,9 +481,34 @@ header {
   transition: opacity .15s;
 }
 .modal button:hover { opacity: .85; }
+.modal button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 
 .section { display: none; }
 .section.visible { display: block; }
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  header { padding: 0 1rem; }
+  .logo span { display: none; }
+  .container { padding: 1rem; }
+
+  .main-tabs { width: 100%; }
+  .main-tab { flex: 1; text-align: center; padding: 7px 10px; font-size: 12px; }
+
+  .stage-legend { gap: 6px; }
+  .legend-pill { font-size: 11px; padding: 3px 8px; }
+
+  .timeline-inner { min-width: 700px; }
+  .tl-stage-label, .tl-stage-label-hdr { width: 90px; min-width: 90px; font-size: 10px; }
+
+  .browse-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .timeline-inner { min-width: 600px; }
+  .tl-stage-label, .tl-stage-label-hdr { width: 70px; min-width: 70px; }
+  .tl-band { font-size: 10px; padding: 0 4px; }
+}
 
 /* scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -401,56 +518,66 @@ header {
 </head>
 <body>
 
+<a class="skip-link" href="#main">Skip to content</a>
+
 <!-- Name Modal -->
-<div class="modal-overlay" id="nameModal">
+<div class="modal-overlay" id="nameModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal">
-    <h2>GMM 2026</h2>
-    <p>Enter your name to join the shared festival planner</p>
-    <input id="nameInput" type="text" placeholder="Your name..." maxlength="20" autocomplete="off">
-    <button onclick="setUser()">Enter the pit ↗</button>
+    <h2 id="modalTitle">GMM 2026</h2>
+    <p>Enter your name to join the festival planner</p>
+    <input id="nameInput" type="text" placeholder="Your name..." maxlength="20" autocomplete="off" aria-label="Your name">
+    <button type="button" id="enterBtn">Enter the pit ↗</button>
   </div>
 </div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <header>
   <div class="logo">GRASPOP 2026 <span>FESTIVAL PLANNER</span></div>
   <div class="header-right">
-    <div class="sync-indicator">
-      <div class="sync-dot"></div>
-      <span id="syncLabel">Live</span>
+    <div class="sync-indicator" aria-label="Sync status: live">
+      <div class="sync-dot" aria-hidden="true"></div>
+      <span id="syncLabel">Local</span>
     </div>
-    <div class="user-badge" id="userBadge" onclick="changeUser()">—</div>
+    <button class="user-badge" id="userBadge" aria-label="Change user">—</button>
   </div>
 </header>
 
-<div class="container">
-  <div class="main-tabs">
-    <button class="main-tab active" onclick="switchView('timeline',this)">Timeline</button>
-    <button class="main-tab" onclick="switchView('browse',this)">Browse</button>
-    <button class="main-tab" onclick="switchView('picks',this)">Shared picks <span class="badge" id="sharedCount" style="display:none"></span></button>
+<div class="container" id="main">
+  <div class="main-tabs" role="tablist" aria-label="Views">
+    <button class="main-tab active" role="tab" aria-selected="true" id="tab-timeline" data-view="timeline">Timeline</button>
+    <button class="main-tab" role="tab" aria-selected="false" id="tab-browse" data-view="browse">Browse</button>
+    <button class="main-tab" role="tab" aria-selected="false" id="tab-picks" data-view="picks">My picks <span class="badge" id="sharedCount" style="display:none"></span></button>
   </div>
 
   <!-- TIMELINE -->
-  <div id="v-timeline" class="section visible">
+  <div id="v-timeline" class="section visible" role="tabpanel" aria-labelledby="tab-timeline">
     <div class="stage-legend" id="legend"></div>
-    <div class="day-tabs" id="tlDays"></div>
-    <div class="timeline-scroll"><div class="timeline-inner" id="tlInner"></div></div>
+    <div class="day-tabs" id="tlDays" role="tablist" aria-label="Day selector"></div>
+    <div class="timeline-scroll" tabindex="0" aria-label="Timeline — scroll horizontally"><div class="timeline-inner" id="tlInner"></div></div>
   </div>
 
   <!-- BROWSE -->
-  <div id="v-browse" class="section">
-    <div class="day-tabs" id="brDays"></div>
+  <div id="v-browse" class="section" role="tabpanel" aria-labelledby="tab-browse">
+    <div class="day-tabs" id="brDays" role="tablist" aria-label="Day selector"></div>
+    <div class="search-bar">
+      <span class="search-icon" aria-hidden="true">⌕</span>
+      <input type="search" id="searchInput" placeholder="Search bands..." aria-label="Search bands">
+    </div>
     <div class="browse-grid" id="brGrid"></div>
   </div>
 
   <!-- PICKS -->
-  <div id="v-picks" class="section">
+  <div id="v-picks" class="section" role="tabpanel" aria-labelledby="tab-picks">
     <div class="picks-header">
-      <div class="picks-title">Shared Picks</div>
+      <div class="picks-title">My Picks</div>
       <div style="display:flex;align-items:center;gap:10px">
         <div class="online-users" id="onlineUsers"></div>
         <span class="online-label" id="onlineLabel"></span>
       </div>
     </div>
+    <div class="local-notice">Picks are stored in this browser. Share this device to plan together, or compare screenshots with friends.</div>
     <div id="picksContent"></div>
   </div>
 </div>
@@ -472,7 +599,24 @@ const DAY_SHORT = ["Thu 18","Fri 19","Sat 20","Sun 21"];
 const AVATAR_COLORS = ["#b8a9f0","#7ec8e3","#7ed9a0","#f0a07a","#f0d07a","#e8c547","#f07ba0","#a0d4f0"];
 
 function toMins(t){const[h,m]=t.split(":").map(Number);return h*60+m;}
-function fmtT(mins){const h=Math.floor(mins/60)%24,m=mins%60;return`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;}
+
+// Proper display of times past midnight
+function fmtT(mins){
+  let h = Math.floor(mins/60);
+  const m = mins % 60;
+  // Display 24:00+ as 00:xx, 01:xx etc for the ruler
+  if(h >= 24) h -= 24;
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
+}
+
+// For ruler display, show "00:30" but annotate "+1" for next-day times
+function fmtRuler(mins){
+  const h = Math.floor(mins/60);
+  const m = mins % 60;
+  const dh = h >= 24 ? h - 24 : h;
+  const suffix = h >= 24 ? "⁺¹" : "";
+  return `${String(dh).padStart(2,"0")}:${String(m).padStart(2,"0")}${suffix}`;
+}
 
 const RAW = {
   "South Stage":{
@@ -507,50 +651,72 @@ const RAW = {
   },
 };
 
-// ─── SHARED STATE (localStorage as shared layer) ─────────────────────────────
-// Key: "gmm2026_picks"  → {username: {name, color, picks: ["band|day", ...]}}
+// ─── STATE ───────────────────────────────────────────────────────────────────
 
 const STORAGE_KEY = "gmm2026_picks";
-const USERS_KEY = "gmm2026_users";
-
 let currentUser = null;
+let activeDay = 0; // synced across views
+let currentView = "timeline";
+let searchQuery = "";
+let lastStateHash = "";
+
+// ─── STORAGE ─────────────────────────────────────────────────────────────────
 
 function loadShared(){
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"); } catch(e){ return {}; }
 }
-function saveShared(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); broadcastChange(); }
-
-function broadcastChange(){
-  // Use BroadcastChannel to sync across tabs
+function saveShared(data){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   try { ch.postMessage("update"); } catch(e){}
 }
 
 let ch;
 try {
   ch = new BroadcastChannel("gmm2026");
-  ch.onmessage = () => { refresh(); };
+  ch.onmessage = () => { render(); };
 } catch(e){ ch = {postMessage:()=>{}}; }
 
-// Also poll every 3s as fallback
-setInterval(refresh, 3000);
+// Reduced polling — only refresh if data actually changed
+setInterval(() => {
+  const hash = localStorage.getItem(STORAGE_KEY) || "";
+  if(hash !== lastStateHash){ lastStateHash = hash; render(); }
+}, 3000);
 
 function getMyPicks(){
   const data = loadShared();
   return new Set(data[currentUser]?.picks || []);
 }
 
-function togglePick(bandKey){
+function togglePick(bKey){
+  if(!currentUser) return;
   const data = loadShared();
   if(!data[currentUser]) data[currentUser] = {name: currentUser, color: getUserColor(currentUser), picks:[]};
   const picks = new Set(data[currentUser].picks);
-  picks.has(bandKey) ? picks.delete(bandKey) : picks.add(bandKey);
+  const wasAdded = !picks.has(bKey);
+  picks.has(bKey) ? picks.delete(bKey) : picks.add(bKey);
   data[currentUser].picks = [...picks];
   saveShared(data);
-  refresh();
+  lastStateHash = JSON.stringify(data);
+
+  // Toast feedback
+  const {name} = parseBandKey(bKey);
+  showToast(wasAdded ? `★ Added ${name}` : `Removed ${name}`);
+  render();
 }
 
 function bandKey(name, day){ return `${name}||${day}`; }
-function parseBandKey(k){ const p=k.split("||"); return {name:p[0], day:p[1]}; }
+function parseBandKey(k){ const i=k.indexOf("||"); return {name:k.slice(0,i), day:k.slice(i+2)}; }
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+
+let toastTimer = null;
+function showToast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> el.classList.remove("show"), 1800);
+}
 
 // ─── USER MANAGEMENT ────────────────────────────────────────────────────────
 
@@ -567,21 +733,43 @@ function setUser(){
   if(!val) return;
   currentUser = val;
   document.getElementById("userBadge").textContent = val;
-  document.getElementById("nameModal").style.display = "none";
-  // Register user
+  closeModal();
   const data = loadShared();
-  if(!data[currentUser]) { data[currentUser] = {name:currentUser, color:getUserColor(currentUser), picks:[]}; saveShared(data); }
-  refresh();
+  if(!data[currentUser]){ data[currentUser] = {name:currentUser, color:getUserColor(currentUser), picks:[]}; saveShared(data); }
+  render();
 }
 
-function changeUser(){
-  document.getElementById("nameInput").value = currentUser || "";
-  document.getElementById("nameModal").style.display = "flex";
+function openModal(){
+  const overlay = document.getElementById("nameModal");
+  overlay.removeAttribute("aria-hidden");
+  const inp = document.getElementById("nameInput");
+  inp.value = currentUser || "";
+  // Focus trap
+  setTimeout(() => inp.focus(), 50);
+  document.addEventListener("keydown", modalKeyHandler);
 }
 
-document.getElementById("nameInput").addEventListener("keydown", e => { if(e.key==="Enter") setUser(); });
+function closeModal(){
+  document.getElementById("nameModal").setAttribute("aria-hidden","true");
+  document.removeEventListener("keydown", modalKeyHandler);
+}
 
-// ─── CLASH DETECTION ─────────────────────────────────────────────────────────
+function modalKeyHandler(e){
+  if(e.key === "Escape"){ if(currentUser) closeModal(); }
+  if(e.key === "Tab"){
+    // Trap focus within modal
+    const modal = document.querySelector(".modal");
+    const focusable = modal.querySelectorAll("input, button");
+    const first = focusable[0], last = focusable[focusable.length-1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+}
+
+// ─── CLASH DETECTION (cached per render) ─────────────────────────────────────
+
+let clashCache = null;
+let clashCacheKey = "";
 
 function getBandData(name, day){
   for(const stage of STAGES){
@@ -593,6 +781,9 @@ function getBandData(name, day){
 }
 
 function getClashKeys(picks){
+  const key = [...picks].sort().join("|");
+  if(key === clashCacheKey && clashCache) return clashCache;
+
   const bands = [...picks].map(k=>{ const {name,day}=parseBandKey(k); return getBandData(name,day); }).filter(Boolean);
   const clashKeys = new Set();
   const clashPairs = [];
@@ -606,19 +797,105 @@ function getClashKeys(picks){
       }
     }
   }
-  return {clashKeys, clashPairs};
+  clashCache = {clashKeys, clashPairs};
+  clashCacheKey = key;
+  return clashCache;
 }
 
-// ─── VIEWS ───────────────────────────────────────────────────────────────────
+// ─── EVENT DELEGATION (no inline handlers) ───────────────────────────────────
 
-let tlDay=0, brDay=0, currentView="timeline";
+// Main tabs
+document.querySelector(".main-tabs").addEventListener("click", e => {
+  const tab = e.target.closest(".main-tab");
+  if(!tab) return;
+  const view = tab.dataset.view;
+  switchView(view);
+});
 
-function switchView(v, btn){
-  currentView=v;
+// User badge
+document.getElementById("userBadge").addEventListener("click", openModal);
+
+// Modal enter
+document.getElementById("enterBtn").addEventListener("click", setUser);
+document.getElementById("nameInput").addEventListener("keydown", e => { if(e.key==="Enter") setUser(); });
+
+// Search
+document.getElementById("searchInput").addEventListener("input", e => {
+  searchQuery = e.target.value.toLowerCase().trim();
+  renderBrowse();
+});
+
+// Timeline clicks (delegated)
+document.getElementById("tlInner").addEventListener("click", e => {
+  const band = e.target.closest(".tl-band");
+  if(!band || !currentUser) return;
+  togglePick(band.dataset.key);
+});
+
+// Timeline keyboard
+document.getElementById("tlInner").addEventListener("keydown", e => {
+  if(e.key === "Enter" || e.key === " "){
+    const band = e.target.closest(".tl-band");
+    if(!band || !currentUser) return;
+    e.preventDefault();
+    togglePick(band.dataset.key);
+  }
+});
+
+// Browse clicks (delegated)
+document.getElementById("brGrid").addEventListener("click", e => {
+  const card = e.target.closest(".band-card");
+  if(!card || !currentUser) return;
+  togglePick(card.dataset.key);
+});
+
+// Browse keyboard
+document.getElementById("brGrid").addEventListener("keydown", e => {
+  if(e.key === "Enter" || e.key === " "){
+    const card = e.target.closest(".band-card");
+    if(!card || !currentUser) return;
+    e.preventDefault();
+    togglePick(card.dataset.key);
+  }
+});
+
+// Picks clicks (delegated)
+document.getElementById("picksContent").addEventListener("click", e => {
+  const item = e.target.closest(".pick-item[data-key]");
+  if(!item || !currentUser) return;
+  togglePick(item.dataset.key);
+});
+
+document.getElementById("picksContent").addEventListener("keydown", e => {
+  if(e.key === "Enter" || e.key === " "){
+    const item = e.target.closest(".pick-item[data-key]");
+    if(!item || !currentUser) return;
+    e.preventDefault();
+    togglePick(item.dataset.key);
+  }
+});
+
+// Day tab clicks (delegated — both day tab sets)
+document.addEventListener("click", e => {
+  const dt = e.target.closest(".day-tab");
+  if(!dt) return;
+  const idx = parseInt(dt.dataset.day, 10);
+  if(isNaN(idx)) return;
+  activeDay = idx;
+  render();
+});
+
+// ─── VIEW SWITCHING ──────────────────────────────────────────────────────────
+
+function switchView(v){
+  currentView = v;
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("visible"));
   document.getElementById("v-"+v).classList.add("visible");
-  document.querySelectorAll(".main-tab").forEach(t=>t.classList.remove("active"));
-  if(btn) btn.classList.add("active");
+  document.querySelectorAll(".main-tab").forEach(t=>{
+    const isActive = t.dataset.view === v;
+    t.classList.toggle("active", isActive);
+    t.setAttribute("aria-selected", isActive);
+  });
   render();
 }
 
@@ -630,49 +907,43 @@ function render(){
   renderOnlineUsers();
 }
 
-function refresh(){ render(); }
-
 // ─── LEGEND ──────────────────────────────────────────────────────────────────
 function buildLegend(){
-  const c = document.getElementById("legend");
-  c.innerHTML = STAGES.map(s=>`
+  document.getElementById("legend").innerHTML = STAGES.map(s=>`
     <div class="legend-pill">
       <div class="legend-dot" style="background:${STAGE_CFG[s].color}"></div>
       ${s}
     </div>`).join("");
 }
 
-// ─── TIMELINE ────────────────────────────────────────────────────────────────
-function buildDayTabs(containerId, active, fn){
+// ─── DAY TABS ────────────────────────────────────────────────────────────────
+function buildDayTabs(containerId){
   document.getElementById(containerId).innerHTML =
-    DAYS.map((d,i)=>`<button class="day-tab${i===active?" active":""}" onclick="${fn}(${i})">${DAY_SHORT[i]}</button>`).join("");
+    DAYS.map((d,i)=>`<button class="day-tab${i===activeDay?" active":""}" role="tab" aria-selected="${i===activeDay}" data-day="${i}">${DAY_SHORT[i]}</button>`).join("");
 }
 
-function switchTlDay(i){ tlDay=i; buildDayTabs("tlDays",tlDay,"switchTlDay"); renderTimeline(); }
-
+// ─── TIMELINE ────────────────────────────────────────────────────────────────
 function renderTimeline(){
-  buildDayTabs("tlDays",tlDay,"switchTlDay");
-  const day = DAYS[tlDay];
+  buildDayTabs("tlDays");
+  const day = DAYS[activeDay];
   const myPicks = getMyPicks();
   const {clashKeys} = getClashKeys(myPicks);
 
-  // compute time range
   let minT=720, maxT=780;
   for(const st of STAGES) for(const [s,e] of (RAW[st][day]||[])){
     minT=Math.min(minT,toMins(s)); maxT=Math.max(maxT,toMins(e));
   }
   minT=Math.floor(minT/30)*30; maxT=Math.ceil(maxT/30)*30;
   const span = maxT-minT;
-  const tickCount = (maxT-minT)/30;
+  const tickCount = span/30;
 
-  // ruler ticks
   const ticks=[];
   for(let t=minT;t<=maxT;t+=30) ticks.push(t);
 
   let html = `<div class="tl-ruler">
     <div class="tl-stage-label-hdr"></div>
     <div class="tl-ruler-times">
-      ${ticks.map(t=>`<span class="tl-tick" style="left:${((t-minT)/span*100).toFixed(2)}%">${fmtT(t)}</span>`).join("")}
+      ${ticks.map(t=>`<span class="tl-tick" style="left:${((t-minT)/span*100).toFixed(2)}%">${fmtRuler(t)}</span>`).join("")}
     </div>
   </div>`;
 
@@ -690,12 +961,18 @@ function renderTimeline(){
       const isFav = myPicks.has(k);
       const isClash = clashKeys.has(k);
       const bdr = isFav ? `border-color:${cfg.color};border-width:2px` : "";
+      const displayS = fmtRuler(toMins(s));
+      const displayE = fmtRuler(toMins(e));
       html += `<div class="tl-band${isFav?" fav":""}${isClash?" clash":""}"
         style="left:${left}%;width:calc(${width}% - 2px);background:${cfg.bg};color:${cfg.color};${bdr}"
-        onclick="tlToggle('${name.replace(/'/g,"\\'")}','${day}')"
-        title="${name} · ${s}–${e}">
-        <span style="overflow:hidden;text-overflow:ellipsis">${name}</span>
-        ${isFav?`<span class="fav-star">★</span>`:""}
+        data-key="${escAttr(k)}"
+        tabindex="0"
+        role="button"
+        aria-label="${escAttr(name)}, ${stage}, ${displayS} to ${displayE}${isFav?', favorited':''}${isClash?', time clash':''}"
+        >
+        <span style="overflow:hidden;text-overflow:ellipsis">${esc(name)}</span>
+        ${isFav?`<span class="fav-star" aria-hidden="true">★</span>`:""}
+        <span class="tl-tooltip">${esc(name)}<br>${stage} · ${displayS}–${displayE}</span>
       </div>`;
     }
     html += `</div></div>`;
@@ -703,47 +980,52 @@ function renderTimeline(){
   document.getElementById("tlInner").innerHTML = html;
 }
 
-function tlToggle(name, day){ if(!currentUser)return; togglePick(bandKey(name,day)); }
-
 // ─── BROWSE ──────────────────────────────────────────────────────────────────
-function switchBrDay(i){ brDay=i; buildDayTabs("brDays",brDay,"switchBrDay"); renderBrowse(); }
-
 function renderBrowse(){
-  buildDayTabs("brDays",brDay,"switchBrDay");
-  const day = DAYS[brDay];
+  buildDayTabs("brDays");
+  const day = DAYS[activeDay];
   const myPicks = getMyPicks();
   const {clashKeys} = getClashKeys(myPicks);
 
-  // all bands for the day, sorted by time
   const list = [];
   for(const stage of STAGES) for(const [s,e,name] of (RAW[stage][day]||[])) list.push({name,stage,s,e});
   list.sort((a,b)=>toMins(a.s)-toMins(b.s));
 
-  document.getElementById("brGrid").innerHTML = list.map(({name,stage,s,e})=>{
+  const filtered = searchQuery
+    ? list.filter(b => b.name.toLowerCase().includes(searchQuery) || b.stage.toLowerCase().includes(searchQuery))
+    : list;
+
+  if(filtered.length === 0){
+    document.getElementById("brGrid").innerHTML = `<div class="no-results">${searchQuery ? `No bands matching "${esc(searchQuery)}"` : "No bands this day"}</div>`;
+    return;
+  }
+
+  document.getElementById("brGrid").innerHTML = filtered.map(({name,stage,s,e})=>{
     const k=bandKey(name,day);
     const fav=myPicks.has(k), clash=clashKeys.has(k);
     const cfg=STAGE_CFG[stage];
-    return `<div class="band-card${fav?" fav":""}${clash?" clash-card":""}" onclick="brToggle('${name.replace(/'/g,"\\'")}','${day}')">
-      <div class="stage-bar" style="background:${cfg.color}"></div>
+    return `<div class="band-card${fav?" fav":""}${clash?" clash-card":""}" data-key="${escAttr(k)}" tabindex="0" role="button" aria-label="${escAttr(name)}, ${stage}, ${s} to ${e}">
+      <div class="stage-bar" style="background:${cfg.color}" aria-hidden="true"></div>
       <div class="band-info">
-        <div class="band-name">${name}</div>
+        <div class="band-name">${esc(name)}</div>
         <div class="band-meta">${stage} · ${s}–${e}</div>
       </div>
-      ${clash?`<span class="clash-tag">clash</span>`:""}
-      <span class="fav-star-btn${fav?" on":""}">${fav?"★":"☆"}</span>
+      ${clash?`<span class="clash-tag" aria-label="Time clash">⚡ clash</span>`:""}
+      <span class="fav-star-btn${fav?" on":""}" aria-hidden="true">${fav?"★":"☆"}</span>
     </div>`;
   }).join("");
 }
 
-function brToggle(name, day){ if(!currentUser)return; togglePick(bandKey(name,day)); }
-
-// ─── SHARED PICKS ────────────────────────────────────────────────────────────
+// ─── PICKS ───────────────────────────────────────────────────────────────────
 function renderPicks(){
   const data = loadShared();
   const users = Object.keys(data).filter(u=>data[u].picks?.length>0);
   const c = document.getElementById("picksContent");
 
   if(!users.length){ c.innerHTML=`<div class="empty-msg">No picks yet — star some bands to add them here!</div>`; return; }
+
+  // Sort: current user first
+  users.sort((a,b) => (a===currentUser?-1:b===currentUser?1:a.localeCompare(b)));
 
   let html = "";
   for(const uname of users){
@@ -755,14 +1037,14 @@ function renderPicks(){
 
     html += `<div class="picks-user-section">
       <div class="picks-user-header">
-        <div class="avatar" style="background:${color};color:#000;margin-left:0">${getInitials(uname)}</div>
-        <span class="picks-user-name" style="color:${color}">${uname}${isMe?" (you)":""}</span>
+        <div class="avatar" style="background:${color};color:#000">${getInitials(uname)}</div>
+        <span class="picks-user-name" style="color:${color}">${esc(uname)}${isMe?" (you)":""}</span>
         <span class="picks-count">${picks.size} pick${picks.size!==1?"s":""}</span>
       </div>`;
 
     if(clashPairs.length){
-      html += `<div class="clash-summary">`;
-      html += clashPairs.map(([a,b])=>`<div class="clash-line">⚡ <strong>${a.name}</strong> vs <strong>${b.name}</strong> — ${a.day.split(" ")[0]} ${a.startStr}–${a.endStr} overlaps ${b.startStr}–${b.endStr}</div>`).join("");
+      html += `<div class="clash-summary" role="alert">`;
+      html += clashPairs.map(([a,b])=>`<div class="clash-line">⚡ <strong>${esc(a.name)}</strong> vs <strong>${esc(b.name)}</strong> — ${a.day.split(" ")[0]} ${fmtRuler(a.start)}–${fmtRuler(a.end)} overlaps ${fmtRuler(b.start)}–${fmtRuler(b.end)}</div>`).join("");
       html += `</div>`;
     }
 
@@ -779,12 +1061,13 @@ function renderPicks(){
         const k=bandKey(b.name,b.day);
         const clash=clashKeys.has(k);
         const cfg=STAGE_CFG[b.stage];
-        html += `<div class="pick-item${clash?" clash-pick":""}" ${isMe?`onclick="togglePick('${k.replace(/'/g,"\\'")}')"`:""}>
-          <div class="pick-dot" style="background:${cfg.color}"></div>
-          <span class="pick-name">${b.name}</span>
-          <span class="pick-meta">${b.stage} · ${b.startStr}–${b.endStr}</span>
-          ${clash?`<span class="clash-tag">clash</span>`:""}
-          ${isMe?`<span style="color:${color};font-size:14px;margin-left:4px">★</span>`:""}
+        const interactive = isMe;
+        html += `<div class="pick-item${clash?" clash-pick":""}" ${interactive?`role="button" tabindex="0" data-key="${escAttr(k)}"`:""}>
+          <div class="pick-dot" style="background:${cfg.color}" aria-hidden="true"></div>
+          <span class="pick-name">${esc(b.name)}</span>
+          <span class="pick-meta">${b.stage} · ${fmtRuler(b.start)}–${fmtRuler(b.end)}</span>
+          ${clash?`<span class="clash-tag" aria-label="Time clash">⚡ clash</span>`:""}
+          ${isMe?`<span style="color:${color};font-size:14px;margin-left:4px" aria-hidden="true">★</span>`:""}
         </div>`;
       }
       html += `</div></div>`;
@@ -796,27 +1079,41 @@ function renderPicks(){
 
 function updateSharedCount(){
   const data = loadShared();
-  const total = Object.values(data).reduce((n,u)=>n+(u.picks?.length||0),0);
+  const myCount = (data[currentUser]?.picks?.length) || 0;
   const el = document.getElementById("sharedCount");
-  if(total>0){ el.textContent=total; el.style.display="inline-block"; }
+  if(myCount>0){ el.textContent=myCount; el.style.display="inline-block"; }
   else el.style.display="none";
 }
 
 function renderOnlineUsers(){
   const data = loadShared();
-  const users = Object.keys(data);
+  const users = Object.keys(data).filter(u=>data[u].picks?.length>0);
   const uEl = document.getElementById("onlineUsers");
   const lEl = document.getElementById("onlineLabel");
   uEl.innerHTML = users.slice(0,6).map(u=>{
     const color = data[u]?.color || getUserColor(u);
-    return `<div class="avatar" style="background:${color};color:#000">${getInitials(u)}</div>`;
+    return `<div class="avatar" style="background:${color};color:#000" aria-label="${esc(u)}">${getInitials(u)}</div>`;
   }).join("");
   lEl.textContent = users.length ? `${users.length} planner${users.length!==1?"s":""}` : "";
+}
+
+// ─── ESCAPING (XSS prevention) ───────────────────────────────────────────────
+
+function esc(s){
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function escAttr(s){
+  return s.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 buildLegend();
 render();
+// Modal starts visible; don't close it until user enters a name
+document.getElementById("nameInput").focus();
 </script>
 </body>
 </html>
