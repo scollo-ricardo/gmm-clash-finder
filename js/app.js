@@ -74,7 +74,9 @@ function getClashKeys(picks){
 // ─── USER MANAGEMENT ─────────────────────────────────────────────────────────
 function setUser(){
   const val=document.getElementById("nameInput").value.trim();if(!val)return;
-  currentUser=val;document.getElementById("userBadge").textContent=val;closeModal();
+  currentUser=val;document.getElementById("userBadge").textContent=val;
+  localStorage.setItem("lastUser",currentUser);
+  closeModal();
   const data=loadShared();if(!data[currentUser]){data[currentUser]={name:currentUser,color:getUserColor(currentUser),picks:[]};saveShared(data);}
   render();
 }
@@ -93,6 +95,7 @@ function buildFestivalPicker(){
       <div class="fest-card-meta">${esc(f.location)}</div>
       <div class="fest-card-meta">${esc(f.dates)}</div>
       <div class="fest-card-stages">${Object.keys(f.stages).length} stages · ${f.days.length} days</div>
+      ${f.updated?.lineup?`<div class="fest-card-updated">Lineup updated: ${esc(f.updated.lineup)}</div>`:""}
     </button>`).join("");
 }
 function selectFestival(id){
@@ -103,6 +106,7 @@ function selectFestival(id){
   document.getElementById("festivalPicker").style.display="none";
   document.getElementById("appMain").style.display="block";
   document.querySelector("header").style.display="flex";
+  document.getElementById("tab-prices").style.display=F.priceList?"":"none";
   buildLegend();switchView("timeline");
 }
 function showPicker(){
@@ -137,7 +141,7 @@ function switchView(v){
   document.querySelectorAll(".main-tab").forEach(t=>{const isActive=t.dataset.view===v;t.classList.toggle("active",isActive);t.setAttribute("aria-selected",isActive);});
   render();
 }
-function render(){if(!currentFestivalId)return;if(currentView==="timeline")renderTimeline();else if(currentView==="browse")renderBrowse();else if(currentView==="picks")renderPicks();updateSharedCount();renderOnlineUsers();}
+function render(){if(!currentFestivalId)return;if(currentView==="timeline")renderTimeline();else if(currentView==="browse")renderBrowse();else if(currentView==="picks")renderPicks();else if(currentView==="prices")renderPrices();updateSharedCount();renderOnlineUsers();}
 
 // ─── LEGEND + DAY TABS ──────────────────────────────────────────────────────
 function buildLegend(){document.getElementById("legend").innerHTML=STAGES.map(s=>`<div class="legend-pill"><div class="legend-dot" style="background:${STAGE_CFG[s].color}"></div>${s}</div>`).join("");}
@@ -210,6 +214,42 @@ function renderOnlineUsers(){const data=loadShared();const users=Object.keys(dat
   uEl.innerHTML=users.slice(0,6).map(u=>{const color=data[u]?.color||getUserColor(u);return`<div class="avatar" style="background:${color};color:#000" aria-label="${esc(u)}">${getInitials(u)}</div>`;}).join("");
   lEl.textContent=users.length?`${users.length} planner${users.length!==1?"s":""}`:"";}
 
+// ─── PRICES ──────────────────────────────────────────────────────────────────
+function renderPrices(){
+  const pl=F.priceList;if(!pl){document.getElementById("pricesContent").innerHTML="";return;}
+  const cur=pl.currency;
+  let html=`<div class="prices-header">
+    <div class="prices-currency-block">
+      <div class="prices-currency-name">1 ${esc(cur.name)}</div>
+      <div class="prices-currency-rates">
+        <span class="prices-rate">€${cur.presale.toFixed(2)} <span class="prices-rate-label">presale</span></span>
+        <span class="prices-rate-sep">/</span>
+        <span class="prices-rate">€${cur.onsite.toFixed(2)} <span class="prices-rate-label">from ${esc(cur.onsiteFrom)}</span></span>
+      </div>
+    </div>
+  </div>`;
+  for(const section of pl.sections){
+    html+=`<div class="prices-section"><div class="prices-section-title">${esc(section.name)}</div><div class="prices-list">`;
+    for(const item of section.items){
+      const eurPresale=(item.price*cur.presale).toFixed(2);const eurOnsite=(item.price*cur.onsite).toFixed(2);
+      html+=`<div class="prices-item">
+        <div class="prices-item-info">
+          <span class="prices-item-name">${esc(item.name)}</span>
+          ${item.detail?`<span class="prices-item-detail">${esc(item.detail)}</span>`:""}
+        </div>
+        <div class="prices-item-right">
+          <span class="prices-item-skulls">${item.price} ${item.price===1?"SKULLY":"SKULLIES"}</span>
+          <span class="prices-item-eur">€${eurPresale} / €${eurOnsite}</span>
+        </div>
+      </div>`;}
+    html+=`</div></div>`;}
+  const pricesUpdated=F.updated?.prices;
+  html+=`<div class="prices-note">${pl.note}${pricesUpdated?` · Prices last updated: ${esc(pricesUpdated)}`:""}</div>`;
+  document.getElementById("pricesContent").innerHTML=html;
+}
+
 // ─── INIT ────────────────────────────────────────────────────────────────────
 buildFestivalPicker();
-document.getElementById("nameInput").focus();
+const savedUser=localStorage.getItem("lastUser");
+if(savedUser){currentUser=savedUser;document.getElementById("userBadge").textContent=savedUser;}
+else{openModal();}

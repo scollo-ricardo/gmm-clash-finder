@@ -14,7 +14,7 @@
 <a class="skip-link" href="#main">Skip to content</a>
 
 <!-- Name Modal -->
-<div class="modal-overlay" id="nameModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<div class="modal-overlay" id="nameModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
   <div class="modal">
     <h2 id="modalTitle">Festival Planner</h2>
     <p>Enter your name to get started</p>
@@ -37,7 +37,11 @@
 
 <header style="display:none">
   <div class="header-left">
-    <button class="back-btn" id="backBtn" aria-label="Back to festival picker">←</button>
+    <button class="back-btn" id="backBtn" aria-label="Back to festival picker">
+  <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="6.5,1.5 2.5,5 6.5,8.5"/>
+  </svg>
+</button>
     <div class="logo">FESTIVAL PLANNER</div>
   </div>
   <div class="header-right">
@@ -54,6 +58,7 @@
     <button class="main-tab active" role="tab" aria-selected="true" id="tab-timeline" data-view="timeline">Timeline</button>
     <button class="main-tab" role="tab" aria-selected="false" id="tab-browse" data-view="browse">Browse</button>
     <button class="main-tab" role="tab" aria-selected="false" id="tab-picks" data-view="picks">My picks <span class="badge" id="sharedCount" style="display:none"></span></button>
+    <button class="main-tab" role="tab" aria-selected="false" id="tab-prices" data-view="prices" style="display:none">Prices</button>
   </div>
 
   <div id="v-timeline" class="section visible" role="tabpanel" aria-labelledby="tab-timeline">
@@ -71,6 +76,10 @@
     </div>
     <div class="search-result-count" id="searchCount" style="display:none"></div>
     <div class="browse-grid" id="brGrid"></div>
+  </div>
+
+  <div id="v-prices" class="section" role="tabpanel" aria-labelledby="tab-prices">
+    <div id="pricesContent"></div>
   </div>
 
   <div id="v-picks" class="section" role="tabpanel" aria-labelledby="tab-picks">

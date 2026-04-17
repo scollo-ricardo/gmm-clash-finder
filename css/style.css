@@ -87,6 +87,12 @@ body {
   padding-top: 8px;
   border-top: 1px solid var(--border);
 }
+.fest-card-updated {
+  font-size: 10px; color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  margin-top: 4px;
+  opacity: 0.6;
+}
 
 /* ── HEADER ── */
 header {
@@ -103,17 +109,17 @@ header {
 }
 .header-left { display: flex; align-items: center; gap: 10px; }
 .back-btn {
-  background: var(--surface3);
-  border: 1px solid var(--border2);
-  border-radius: 6px;
+  background: transparent;
+  border: 1.5px solid var(--border2);
+  border-radius: 50%;
   color: var(--muted);
-  font-size: 16px;
-  width: 32px; height: 32px;
+  width: 34px; height: 34px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: color .15s, border-color .15s;
+  transition: color .2s, border-color .2s, background .2s;
+  flex-shrink: 0;
 }
-.back-btn:hover { color: var(--text); border-color: var(--accent); }
+.back-btn:hover { color: var(--accent); border-color: var(--accent); background: rgba(232,197,71,0.08); }
 .back-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .logo {
@@ -660,6 +666,90 @@ header {
 @media (max-width: 480px) {
   .tl-mobile-time { width: 36px; font-size: 10px; }
   .tl-mobile-name { font-size: 12px; }
+}
+
+/* ── PRICES ── */
+.prices-header {
+  margin-bottom: 1.5rem;
+}
+.prices-currency-block {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 12px 18px;
+}
+.prices-currency-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+}
+.prices-currency-rates {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.prices-rate { color: var(--text); }
+.prices-rate-label { color: var(--muted); }
+.prices-rate-sep { color: var(--border2); }
+
+.prices-section { margin-bottom: 1.5rem; }
+.prices-section-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.prices-list { display: flex; flex-direction: column; gap: 4px; }
+.prices-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.prices-item-info { flex: 1; min-width: 0; }
+.prices-item-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.prices-item-detail {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  margin-left: 8px;
+}
+.prices-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.prices-item-skulls {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: var(--accent);
+}
+.prices-item-eur {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  color: var(--muted);
+}
+.prices-note {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 0.5rem;
 }
 
 /* scrollbar */

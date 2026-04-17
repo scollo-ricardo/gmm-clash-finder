@@ -9,6 +9,7 @@ const FESTIVALS = {
     short: "GRASPOP 2026",
     location: "Dessel, Belgium",
     dates: "18–21 June 2026",
+    updated: { lineup: "17 Apr 2026", prices: "17 Apr 2026" },
     stages: {
       "South Stage":   {color:"#b8a9f0", bg:"rgba(184,169,240,0.18)"},
       "North Stage":   {color:"#7ec8e3", bg:"rgba(126,200,227,0.18)"},
@@ -50,6 +51,39 @@ const FESTIVALS = {
         "Sunday 21st June":[["12:00","12:40","Return To Dust"],["13:20","14:00","Rain City Drive"],["14:50","15:35","TX2"],["16:30","17:20","Future Palace"],["18:15","19:05","Periphery"],["20:05","20:55","Solstafir"],["21:55","22:55","Carpenter Brut"]],
       },
     },
+    priceList: {
+      currency: { name: "SKULLY", presale: 3.60, onsite: 3.90, onsiteFrom: "15 June 2026" },
+      note: "Price list will be updated as the festival approaches.",
+      sections: [
+        {
+          name: "Soft Drinks & Non-Alcoholic",
+          items: [
+            { name: "Coca-Cola / Coca-Cola Zero / Fanta / Sprite Zero", detail: "33 CL can", price: 1 },
+            { name: "Aquarius Red Peach", detail: "33 CL", price: 1 },
+            { name: "Spa Reine & Spa Intense", detail: "50 CL", price: 1 },
+            { name: "Red Bull (incl. Watermelon, Zero)", detail: "25 CL", price: 1 },
+            { name: "Fuze Tea (Peach Hibiscus, Sparkling Lemon, Green Tea)", detail: "33 CL", price: 1 },
+            { name: "Corona Cero 0.0%", detail: "33 CL", price: 1.5 },
+          ],
+        },
+        {
+          name: "Beer & Wine",
+          items: [
+            { name: "Jupiler", detail: "25 CL reuse cup", price: 1 },
+            { name: "Jupiler", detail: "50 CL reuse cup", price: 2 },
+            { name: "Hoegaarden Rosée", detail: "25 CL", price: 1 },
+            { name: "2 Wine — Rosé & Brut", detail: "25 CL can", price: 2.2 },
+          ],
+        },
+        {
+          name: "Accessories",
+          items: [
+            { name: "Cupkeeper", detail: "", price: 1 },
+            { name: "Grippo", detail: "", price: 1 },
+          ],
+        },
+      ],
+    },
   },
 
   "2000trees-2026": {
@@ -58,6 +92,7 @@ const FESTIVALS = {
     short: "2000TREES 2026",
     location: "Upcote Farm, Cheltenham",
     dates: "8–11 July 2026",
+    updated: { lineup: "17 Apr 2026" },
     stages: {
       "Main Stage":      {color:"#e85d75", bg:"rgba(232,93,117,0.18)"},
       "The Cave":        {color:"#7ec8e3", bg:"rgba(126,200,227,0.18)"},
